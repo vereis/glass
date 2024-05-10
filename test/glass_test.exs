@@ -58,5 +58,40 @@ defmodule GlassTest do
       # Contains the method being used for proxying
       assert log =~ "`Glass.Methods.RPC`"
     end
+
+    test "if `as: Alias` provided, proxy is aliased accordingly" do
+      Code.eval_string("""
+        defmodule MyApp.Users3 do
+          use Glass
+
+          defglass Enum, via: Glass.Methods.RPC, private: false, debug: true, as: Mune
+
+          def display_name(%{first_name: first_name, last_name: last_name}) do
+            Mune.join([first_name, last_name], " ")
+          end
+        end
+      """)
+
+      # A proxy was created
+      assert Code.loaded?(MyApp.Users3.Glasses.Enum)
+
+      # Proxy was successfully executed
+      assert log =
+               capture_log([level: :debug], fn ->
+                 apply(MyApp.Users3, :display_name, [%{first_name: "John", last_name: "Doe"}])
+               end)
+
+      # Contains call being proxied
+      assert log =~ "Proxying call to `Enum.join/2`"
+
+      # Contains arguments being passed
+      assert log =~ "[\"John\", \"Doe\"]"
+
+      # Contains the proxy module created
+      assert log =~ "`MyApp.Users3.Glasses.Enum`"
+
+      # Contains the method being used for proxying
+      assert log =~ "`Glass.Methods.RPC`"
+    end
   end
 end

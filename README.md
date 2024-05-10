@@ -105,6 +105,9 @@ iex(1)> MyApp.Users.users_report()
 - `:debug` (default: `false`): Whether or not to generate debug information when proxying
   function calls. This is useful for debugging and tracing calls between modules.
 
+- `:as`: If provided, aliases and binds the created `Glass` proxy to the specified alias.
+  If not provided, any `Glass` proxy must be called via its fully qualified name.
+
 ## Caveats
 
 - **Magic**: This is a _very_ magical library and should be used with caution. It's designed

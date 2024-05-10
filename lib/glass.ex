@@ -41,6 +41,8 @@ defmodule Glass do
   * `:via` - The method to use for calling proxied functions. Defaults to `Glass.Methods.Apply`.
   * `:private` - Whether or not to generate the proxy module as private. Defaults to `true`.
   * `:debug` - Whether or not to generate proxy debug information. Defaults to `false`.
+  * `:as` - The alias to use for the proxied module. If not provided, the proxy module must be called
+    directly by the full name of the original module.
 
   ## See Also
 
@@ -68,7 +70,17 @@ defmodule Glass do
 
     # Local alias to shadow the original module with proxy namespace
     # i.e. `Elixir.MyOtherApp`
-    as_namespace = Module.concat(:"Elixir", namespace |> Module.split() |> List.last())
+    as_namespace =
+      Keyword.get(
+        opts,
+        :as,
+        Module.concat(
+          :"Elixir",
+          namespace
+          |> Module.split()
+          |> List.last()
+        )
+      )
 
     # Method to use for calling proxied functions via Glass proxy
     via = Keyword.get(opts, :via, Glass.Methods.Apply)
